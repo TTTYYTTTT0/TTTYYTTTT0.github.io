@@ -5,93 +5,269 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登录</title>
     <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --error-color: #ef233c;
+            --success-color: #4cc9f0;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             margin: 0;
-            padding: 20px;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
         }
-        .login-box {
+        
+        .login-container {
+            width: 100%;
+            max-width: 380px;
+            padding: 2rem;
+        }
+        
+        .login-card {
             background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            transition: transform 0.3s ease;
         }
+        
+        .login-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .login-header h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-header p {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
+            position: relative;
         }
-        label {
+        
+        .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #495057;
+            font-weight: 500;
+            font-size: 0.95rem;
         }
-        input {
+        
+        .form-control {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background-color: #f8f9fa;
         }
-        button {
-            background: #2563eb;
-            color: white;
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .form-control::placeholder {
+            color: #adb5bd;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 1rem;
             border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            width: 100%;
-            font-size: 16px;
+            transition: all 0.3s;
         }
-        .error {
-            color: #ef4444;
-            margin-top: 10px;
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(to right, #3a56e8, #2e0aa3);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary:disabled {
+            background: #adb5bd;
+            transform: none;
+            cursor: not-allowed;
+        }
+        
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
             display: none;
+        }
+        
+        .footer-text {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        .footer-text a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+        
+        /* 输入框图标 (使用伪元素) */
+        .form-group.password::after,
+        .form-group.username::after {
+            content: "";
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            background-size: contain;
+            opacity: 0.5;
+        }
+        
+        .form-group.username::after {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23424242"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+        }
+        
+        .form-group.password::after {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23424242"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>');
         }
     </style>
 </head>
 <body>
-    <form id="login-form"> <!-- 添加 form 标签包裹 -->
-      <input type="text" id="username" placeholder="用户名">
-      <input type="password" id="password" placeholder="密码">
-      <button type="submit" id="login-btn">登录</button>
-    </form>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>欢迎回来</h1>
+                <p>请输入您的账号和密码登录系统</p>
+            </div>
+            
+            <form id="login-form">
+                <div class="form-group username">
+                    <label for="username">用户名</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        class="form-control" 
+                        placeholder="请输入用户名"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group password">
+                    <label for="password">密码</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        class="form-control" 
+                        placeholder="请输入密码"
+                        required
+                    >
+                </div>
+                
+                <button type="submit" id="login-btn" class="btn btn-primary">
+                    <span id="btn-text">登录</span>
+                    <span id="btn-spinner" style="display:none;">⏳</span>
+                </button>
+                
+                <div id="error-message" class="error-message">
+                    用户名或密码错误
+                </div>
+            </form>
+            
+            <div class="footer-text">
+                忘记密码？<a href="#">点击重置</a>
+            </div>
+        </div>
+    </div>
 
     <script>
-      document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault(); // 必须阻止默认提交！
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('login-btn');
+            const btnText = document.getElementById('btn-text');
+            const spinner = document.getElementById('btn-spinner');
+            const errorMsg = document.getElementById('error-message');
+            
+            // 显示加载状态
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            spinner.style.display = 'inline';
+            errorMsg.style.display = 'none';
+            
+            try {
+                const response = await fetch('/.netlify/functions/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value.trim(),
+                        password: document.getElementById('password').value.trim()
+                    }),
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/protected.html';
+                } else {
+                    const data = await response.json();
+                    errorMsg.textContent = data.error || '登录失败，请重试';
+                    errorMsg.style.display = 'block';
+                }
+            } catch (err) {
+                console.error('网络错误:', err);
+                errorMsg.textContent = '网络连接异常';
+                errorMsg.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btnText.style.display = 'inline';
+                spinner.style.display = 'none';
+            }
+        });
         
-        const btn = document.getElementById('login-btn');
-        btn.disabled = true; // 防止重复提交
-        
-        try {
-          const response = await fetch('/.netlify/functions/auth', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              username: document.getElementById('username').value.trim(),
-              password: document.getElementById('password').value.trim()
-            }),
-            credentials: 'include' // 确保携带 Cookie
-          });
-    
-          if (response.ok) {
-            window.location.href = '/protected.html'; // 必须在确认登录成功后跳转
-          } else {
-            alert('登录失败: ' + (await response.json()).error);
-          }
-        } catch (err) {
-          console.error('网络错误:', err);
-          alert('网络连接异常');
-        } finally {
-          btn.disabled = false;
-        }
-      });
+        // 输入时隐藏错误信息
+        document.getElementById('username').addEventListener('input', () => {
+            document.getElementById('error-message').style.display = 'none';
+        });
+        document.getElementById('password').addEventListener('input', () => {
+            document.getElementById('error-message').style.display = 'none';
+        });
     </script>
 </body>
 </html>
