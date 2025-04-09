@@ -56,37 +56,42 @@
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h1>管理员登录</h1>
-        <div class="form-group">
-            <label for="username">用户名</label>
-            <input type="text" id="username" placeholder="输入用户名">
-        </div>
-        <div class="form-group">
-            <label for="password">密码</label>
-            <input type="password" id="password" placeholder="输入密码">
-        </div>
-        <button id="login-btn">登录</button>
-        <div class="error" id="error-msg">用户名或密码错误</div>
-    </div>
+    <form id="login-form"> <!-- 添加 form 标签包裹 -->
+      <input type="text" id="username" placeholder="用户名">
+      <input type="password" id="password" placeholder="密码">
+      <button type="submit" id="login-btn">登录</button>
+    </form>
 
     <script>
-        document.getElementById('login-btn').addEventListener('click', async (e) => {
-          e.preventDefault();
+      document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault(); // 必须阻止默认提交！
+        
+        const btn = document.getElementById('login-btn');
+        btn.disabled = true; // 防止重复提交
+        
+        try {
           const response = await fetch('/.netlify/functions/auth', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              username: document.getElementById('username').value,
-              password: document.getElementById('password').value
+              username: document.getElementById('username').value.trim(),
+              password: document.getElementById('password').value.trim()
             }),
-            credentials: 'include' // 关键！必须添加
+            credentials: 'include' // 确保携带 Cookie
           });
-          
+    
           if (response.ok) {
-            window.location.href = '/protected.html'; // 跳转必须在请求成功后
+            window.location.href = '/protected.html'; // 必须在确认登录成功后跳转
+          } else {
+            alert('登录失败: ' + (await response.json()).error);
           }
-        });
+        } catch (err) {
+          console.error('网络错误:', err);
+          alert('网络连接异常');
+        } finally {
+          btn.disabled = false;
+        }
+      });
     </script>
 </body>
 </html>
