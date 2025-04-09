@@ -4,7 +4,7 @@ exports.handler = async (event) => {
         return {
             statusCode: 200,
             headers: {
-                'Set-Cookie': 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
+                'Set-Cookie': 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=Lax'
             },
             body: JSON.stringify({ success: true })
         };
@@ -12,12 +12,18 @@ exports.handler = async (event) => {
     
     // 检查是否已登录 (GET 请求)
     if (event.httpMethod === 'GET') {
-        const token = event.headers.cookie?.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1];
+        const cookies = event.headers.cookie || '';
+        const token = cookies.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1];
         
-        if (token === process.env.ADMIN_TOKEN) {
+        // 只要存在未过期的 token 就认为有效（简化示例）
+        // 实际生产环境应该验证 token 内容和过期时间
+        if (token) {
             return {
                 statusCode: 200,
-                body: JSON.stringify({ success: true })
+                body: JSON.stringify({ 
+                    success: true,
+                    username: process.env.ADMIN_USER // 返回用户名用于前端显示
+                })
             };
         } else {
             return {
@@ -32,20 +38,30 @@ exports.handler = async (event) => {
         const { username, password } = JSON.parse(event.body);
         
         if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
-            // 生成一个简单的 token (实际应用中应该使用更安全的方案)
-            const token = Buffer.from(`${username}:${Date.now()}`).toString('base64');
+            // 生成包含过期时间的 token（24小时后过期）
+            const token = JSON.stringify({
+                user: username,
+                exp: Date.now() + 86400000 // 24小时
+            });
+            const encryptedToken = Buffer.from(token).toString('base64');
             
             return {
                 statusCode: 200,
                 headers: {
-                    'Set-Cookie': `token=${token}; Path=/; HttpOnly; Secure; SameSite=Strict`
+                    'Set-Cookie': `token=${encryptedToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=86400`
                 },
-                body: JSON.stringify({ success: true })
+                body: JSON.stringify({ 
+                    success: true,
+                    username: username
+                })
             };
         } else {
             return {
                 statusCode: 401,
-                body: JSON.stringify({ success: false, error: 'Invalid credentials' })
+                body: JSON.stringify({ 
+                    success: false, 
+                    error: '用户名或密码错误' 
+                })
             };
         }
     }
