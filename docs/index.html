@@ -71,33 +71,29 @@
     </div>
 
     <script>
-        document.getElementById('login-btn').addEventListener('click', async () => {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
+        document.getElementById('login-btn').addEventListener('click', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        try {
+            const response = await fetch('/.netlify/functions/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+                credentials: 'include' // 关键！携带 Cookie
+            });
             
-            try {
-                const response = await fetch('/.netlify/functions/auth', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password })
-                });
-                
+            if (response.ok) {
                 const data = await response.json();
-                
-                if (data.success) {
-                    // 登录成功，跳转到受保护页面
-                    window.location.href = '/protected.html';
-                } else {
-                    // 显示错误信息
-                    document.getElementById('error-msg').style.display = 'block';
-                }
-            } catch (error) {
-                console.error('登录错误:', error);
-                document.getElementById('error-msg').style.display = 'block';
+                window.location.href = '/protected.html';
+            } else {
+                alert('登录失败，请检查凭证');
             }
-        });
+        } catch (err) {
+            console.error('登录错误:', err);
+        }
+    });
     </script>
 </body>
 </html>
