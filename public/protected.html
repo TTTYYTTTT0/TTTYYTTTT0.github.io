@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>受保护内容</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>欢迎访问受保护内容</h1>
+    <p>这里是只有登录后才能查看的内容。</p>
+    
+    <button class="logout-btn" id="logout-btn">退出登录</button>
+    
+    <script>
+        // 检查是否已登录
+        fetch('/.netlify/functions/auth')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    window.location.href = '/';
+                }
+            })
+            .catch(() => {
+                window.location.href = '/';
+            });
+            
+        // 退出登录
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            fetch('/.netlify/functions/auth', {
+                method: 'DELETE'
+            }).then(() => {
+                window.location.href = '/';
+            });
+        });
+    </script>
+</body>
+</html>
