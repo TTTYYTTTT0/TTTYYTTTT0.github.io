@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .error {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        #protected-content {
+            display: none;
+        }
+        
+        #logout-btn {
+            background-color: #f44336;
+            margin-top: 20px;
+        }
+        
+        #logout-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="login-form">
+        <h1>用户登录</h1>
+        <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" id="username" placeholder="请输入用户名">
+        </div>
+        <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" id="password" placeholder="请输入密码">
+        </div>
+        <button id="login-btn">登录</button>
+        <div class="error" id="error-message">用户名或密码错误</div>
+    </div>
+    
+    <div class="container" id="protected-content">
+        <h1>欢迎, <span id="welcome-user"></span>!</h1>
+        <p>您已成功登录，可以访问此受保护的内容。</p>
+        <p>这里可以放置您需要保护的网页内容。</p>
+        <button id="logout-btn">退出登录</button>
+    </div>
+
+    <script>
+        // 预定义的用户名和密码（在实际应用中，应该使用服务器端验证）
+        const validUsers = {
+            "admin": "123456",
+            "TTTYYTTTT": "tttyytttt",
+            "test": "test123"
+        };
+        
+        // 获取DOM元素
+        const loginForm = document.getElementById('login-form');
+        const protectedContent = document.getElementById('protected-content');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('error-message');
+        const welcomeUser = document.getElementById('welcome-user');
+        
+        // 检查本地存储中是否有登录状态
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            showProtectedContent(localStorage.getItem('username'));
+        }
+        
+        // 登录按钮点击事件
+        loginBtn.addEventListener('click', function() {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (validateLogin(username, password)) {
+                // 保存登录状态到本地存储
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username);
+                
+                showProtectedContent(username);
+            } else {
+                errorMessage.style.display = 'block';
+            }
+        });
+        
+        // 退出登录按钮点击事件
+        logoutBtn.addEventListener('click', function() {
+            // 清除本地存储中的登录状态
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            
+            // 显示登录表单，隐藏受保护内容
+            loginForm.style.display = 'block';
+            protectedContent.style.display = 'none';
+            
+            // 清空输入框和错误信息
+            usernameInput.value = '';
+            passwordInput.value = '';
+            errorMessage.style.display = 'none';
+        });
+        
+        // 验证登录信息
+        function validateLogin(username, password) {
+            return validUsers[username] === password;
+        }
+        
+        // 显示受保护内容
+        function showProtectedContent(username) {
+            loginForm.style.display = 'none';
+            protectedContent.style.display = 'block';
+            welcomeUser.textContent = username;
+            errorMessage.style.display = 'none';
+        }
+        
+        // 按回车键登录
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loginBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
