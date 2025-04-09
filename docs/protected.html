@@ -29,17 +29,20 @@
     <button class="logout-btn" id="logout-btn">退出登录</button>
     
     <script>
-        // 检查是否已登录
-        fetch('/.netlify/functions/auth')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    window.location.href = '/';
-                }
-            })
-            .catch(() => {
-                window.location.href = '/';
-            });
+        // 页面加载时验证登录状态
+        fetch('/.netlify/functions/auth', {
+            credentials: 'include' // 关键！携带 Cookie
+        })
+        .then(response => {
+            if (!response.ok) window.location.href = '/';
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('welcome-user').textContent = data.username;
+        })
+        .catch(() => {
+            window.location.href = '/';
+        });
             
         // 退出登录
         document.getElementById('logout-btn').addEventListener('click', () => {
