@@ -72,28 +72,21 @@
 
     <script>
         document.getElementById('login-btn').addEventListener('click', async (e) => {
-        e.preventDefault();
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        
-        try {
-            const response = await fetch('/.netlify/functions/auth', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
-                credentials: 'include' // 关键！携带 Cookie
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                window.location.href = '/protected.html';
-            } else {
-                alert('登录失败，请检查凭证');
-            }
-        } catch (err) {
-            console.error('登录错误:', err);
-        }
-    });
+          e.preventDefault();
+          const response = await fetch('/.netlify/functions/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: document.getElementById('username').value,
+              password: document.getElementById('password').value
+            }),
+            credentials: 'include' // 关键！必须添加
+          });
+          
+          if (response.ok) {
+            window.location.href = '/protected.html'; // 跳转必须在请求成功后
+          }
+        });
     </script>
 </body>
 </html>
