@@ -23,28 +23,51 @@
     </style>
 </head>
 <body>
-    <h1>欢迎访问受保护内容</h1>
+    <h1>欢迎, <span id="welcome-user"></span>!</h1>
     <p>这里是只有登录后才能查看的内容。</p>
     
     <button class="logout-btn" id="logout-btn">退出登录</button>
     
     <script>
-        // 页面加载时验证登录状态
-        fetch('/.netlify/functions/auth', {
-          credentials: 'include' // 关键！必须添加
-        })
-        .then(response => response.ok ? response.json() : Promise.reject())
-        .then(data => {
-          document.getElementById('welcome-user').textContent = data.username;
-        })
-        .catch(() => {
-          window.location.href = '/'; // 未登录则退回首页
-        });
+        async function checkAuth() {
+            try {
+                const response = await fetch('/.netlify/functions/auth', {
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) throw new Error('未授权');
+                
+                const data = await response.json();
+                if (!data.success) throw new Error('登录无效');
+                
+                // 更新用户界面
+                document.getElementById('welcome-user').textContent = data.username || '用户';
+                
+            } catch (error) {
+                console.error('认证失败:', error);
+                // 清除无效的token
+                await fetch('/.netlify/functions/auth', {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                window.location.href = '/';
+            }
+        }
+
+        // 页面加载时检查
+        checkAuth();
+
+        // 定期检查登录状态(每5分钟)
+        setInterval(checkAuth, 300000);
             
         // 退出登录
         document.getElementById('logout-btn').addEventListener('click', () => {
             fetch('/.netlify/functions/auth', {
-                method: 'DELETE'
+                method: 'DELETE',
+                credentials: 'include'  // 确保携带 Cookie
             }).then(() => {
                 window.location.href = '/';
             });
